@@ -14,6 +14,7 @@ def load_data(ui):
         return
 
     try:
+        ui.status_bar.showMessage("Начало сканирования...")
         if ui.demo_mode_checkbox.isChecked():
             # Используем моковые данные
             data = generate_mock_services()
@@ -23,7 +24,8 @@ def load_data(ui):
             print("Собранные данные:", data)  # Отладочный вывод
 
         ui.table.setRowCount(0)  # Очистить таблицу
-        for row in data:
+        for index, row in enumerate(data, start=1):
+            ui.status_bar.showMessage(f"Сканирование хоста {index} из {len(data)}...")
             row_position = ui.table.rowCount()
             ui.table.insertRow(row_position)
             for col, key in enumerate([
@@ -55,10 +57,13 @@ def load_data(ui):
 
                 ui.table.setItem(row_position, col, item)
 
+        ui.status_bar.showMessage("Сканирование завершено.")
         update_stats(ui)
         QMessageBox.information(ui, "Успех", "Данные успешно загружены!")
     except Exception as e:
+        ui.status_bar.showMessage("Ошибка при сканировании.")
         QMessageBox.critical(ui, "Ошибка", f"Ошибка загрузки данных: {e}")
+
 
 
 def open_disc(ui):

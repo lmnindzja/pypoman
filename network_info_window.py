@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QPushButton
 from PyQt5.QtGui import QColor
+import matplotlib.pyplot as plt
+import networkx as nx
 
 class NetworkInfoWindow(QDialog):
     def __init__(self, network_data, parent=None):
@@ -50,3 +52,23 @@ class NetworkInfoWindow(QDialog):
                 self.table.setItem(row_idx, col_idx, cell_item)
 
         layout.addWidget(self.table)
+
+        # Кнопка для генерации сетевой схемы
+        self.graph_button = QPushButton("Сетевая схема")
+        self.graph_button.clicked.connect(lambda: self.generate_network_graph(network_data))
+        layout.addWidget(self.graph_button)
+
+    def generate_network_graph(self, data):
+        """Генерация и отображение сетевой схемы."""
+        G = nx.Graph()
+
+        for connection in data:
+            local = connection.get("LocalAddress", "")
+            remote = connection.get("RemoteAddress", "")
+            if local and remote:
+                G.add_edge(local, remote)
+
+        plt.figure(figsize=(10, 8))
+        nx.draw_networkx(G, with_labels=True, node_color="lightblue", edge_color="gray", font_size=10)
+        plt.title("Сетевая схема")
+        plt.show()
